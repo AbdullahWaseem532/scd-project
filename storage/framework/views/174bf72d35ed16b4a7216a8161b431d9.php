@@ -169,9 +169,10 @@
                                             <span class="product-badge"><?php echo e($product['badge']); ?></span>
                                         <?php endif; ?>
                                         <img src="<?php echo e(asset('images' . $product['image'])); ?>" alt="">
-
                                     </div>
-                                    <div class="product-info">
+                                </a>
+                                <div class="product-info">
+                                    <a href="<?php echo e(route('products.show', $product['id'])); ?>">
                                         <span class="product-category"><?php echo e($product['category']); ?></span>
                                         <h3 class="product-title"><?php echo e($product['title']); ?></h3>
                                         <div class="product-author">
@@ -199,32 +200,39 @@
                                             </div>
                                             <span class="rating-count">(<?php echo e($product['reviews']); ?>)</span>
                                         </div>
-                                        <div class="product-footer">
+                                    </a>
+                                    <div class="product-footer">
+                                        <a href="<?php echo e(route('products.show', $product['id'])); ?>">
                                             <span class="product-price">$<?php echo e(number_format($product['price'], 2)); ?></span>
-                                            <button class="btn btn-primary btn-sm">Add to Cart</button>
-                                        </div>
+                                        </a>
+                                        <button class="btn btn-primary btn-sm add-to-cart" data-id="<?php echo e($product['id']); ?>"
+                                            data-title="<?php echo e($product['title']); ?>" data-price="<?php echo e($product['price']); ?>"
+                                            data-author="<?php echo e($product['author']); ?>" data-image="<?php echo e($product['image']); ?>">
+                                            Add to Cart
+                                        </button>
                                     </div>
-                                </a>
+                                </div>
                             </div>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
+                </div>
 
-                    <!-- Pagination -->
-                    <div class="pagination">
-                        <button class="pagination-btn" disabled>
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <button class="pagination-btn active">1</button>
-                        <button class="pagination-btn">2</button>
-                        <button class="pagination-btn">3</button>
-                        <span class="pagination-dots">...</span>
-                        <button class="pagination-btn">10</button>
-                        <button class="pagination-btn">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="pagination-btn" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="pagination-btn active">1</button>
+                    <button class="pagination-btn">2</button>
+                    <button class="pagination-btn">3</button>
+                    <span class="pagination-dots">...</span>
+                    <button class="pagination-btn">10</button>
+                    <button class="pagination-btn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
                 </div>
             </div>
+        </div>
         </div>
     </section>
 <?php $__env->stopSection(); ?>
@@ -325,6 +333,32 @@
                 });
 
                 products.forEach(p => (p.style.display = "block"));
+            });
+        });
+    </script>
+
+    <script>
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.addEventListener('click', function () {
+                fetch('<?php echo e(route('cart.add')); ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
+                    },
+                    body: JSON.stringify({
+                        id: this.dataset.id,
+                        title: this.dataset.title,
+                        price: this.dataset.price,
+                        author: this.dataset.author,
+                        image: this.dataset.image,
+                    })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        alert(data.message)
+                        window.location.href = '<?php echo e(route('cart')); ?>';
+                    });
             });
         });
     </script>

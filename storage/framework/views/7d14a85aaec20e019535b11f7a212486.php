@@ -85,13 +85,6 @@
                     <h3 class="category-title">Business</h3>
                     <p class="category-count">75+ Courses</p>
                 </div>
-                <div class="category-card">
-                    <div class="category-icon">
-                        <i class="fas fa-brain"></i>
-                    </div>
-                    <h3 class="category-title">Personal Growth</h3>
-                    <p class="category-count">60+ Courses</p>
-                </div>
             </div>
         </div>
     </section>
@@ -108,10 +101,14 @@
                     <div class="product-card">
                         <a href="<?php echo e(route('products.show', $product['id'])); ?>">
                             <div class="product-image">
-                                <span class="product-badge"><?php echo e($product['badge']); ?></span>
+                                <?php if(isset($product['badge'])): ?>
+                                    <span class="product-badge"><?php echo e($product['badge']); ?></span>
+                                <?php endif; ?>
                                 <img src="<?php echo e(asset('images' . $product['image'])); ?>" alt="">
                             </div>
-                            <div class="product-info">
+                        </a>
+                        <div class="product-info">
+                            <a href="<?php echo e(route('products.show', $product['id'])); ?>">
                                 <span class="product-category"><?php echo e($product['category']); ?></span>
                                 <h3 class="product-title"><?php echo e($product['title']); ?></h3>
                                 <div class="product-author">
@@ -125,14 +122,20 @@
                                                 class="fas fa-star<?php echo e($i < floor($product['rating']) ? '' : ($i < $product['rating'] ? '-half-alt' : ' star-empty')); ?>"></i>
                                         <?php endfor; ?>
                                     </div>
-                                    <span class="rating-count">(<?php echo e($product['reviews']); ?> reviews)</span>
+                                    <span class="rating-count">(<?php echo e($product['reviews']); ?>)</span>
                                 </div>
-                                <div class="product-footer">
+                            </a>
+                            <div class="product-footer">
+                                <a href="<?php echo e(route('products.show', $product['id'])); ?>">
                                     <span class="product-price">$<?php echo e(number_format($product['price'], 2)); ?></span>
-                                    <button class="btn btn-primary btn-sm">Add to Cart</button>
-                                </div>
+                                </a>
+                                <button class="btn btn-primary btn-sm add-to-cart" data-id="<?php echo e($product['id']); ?>"
+                                    data-title="<?php echo e($product['title']); ?>" data-price="<?php echo e($product['price']); ?>"
+                                    data-author="<?php echo e($product['author']); ?>" data-image="<?php echo e($product['image']); ?>">
+                                    Add to Cart
+                                </button>
                             </div>
-                        </a>
+                        </div>
                     </div>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
@@ -172,27 +175,7 @@
                     <p class="feature-description">Earn recognized certificates upon course completion to boost your resume
                     </p>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-mobile-alt"></i>
-                    </div>
-                    <h3 class="feature-title">Mobile Learning</h3>
-                    <p class="feature-description">Learn on the go with our mobile-optimized platform and apps</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-sync"></i>
-                    </div>
-                    <h3 class="feature-title">Regular Updates</h3>
-                    <p class="feature-description">Content regularly updated to keep you current with industry trends</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-headset"></i>
-                    </div>
-                    <h3 class="feature-title">24/7 Support</h3>
-                    <p class="feature-description">Our dedicated support team is always here to help you succeed</p>
-                </div>
+                
             </div>
         </div>
     </section>
@@ -239,5 +222,32 @@
             </div>
         </div>
     </section>
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('scripts'); ?>
+    <script>
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.addEventListener('click', function () {
+                fetch('<?php echo e(route('cart.add')); ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
+                    },
+                    body: JSON.stringify({
+                        id: this.dataset.id,
+                        title: this.dataset.title,
+                        price: this.dataset.price,
+                        author: this.dataset.author,
+                        image: this.dataset.image,
+                    })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        alert(data.message)
+                        window.location.href = '<?php echo e(route('cart')); ?>';
+                    });
+            });
+        });
+    </script>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\coursehub\resources\views/pages/home.blade.php ENDPATH**/ ?>

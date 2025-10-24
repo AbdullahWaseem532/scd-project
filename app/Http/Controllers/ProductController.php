@@ -183,7 +183,7 @@ class ProductController extends Controller
         $product = [
             'id' => 1,
             'title' => 'Complete Web Development Bootcamp',
-            'description' => 'Master front-end and back-end technologies in this comprehensive Web Development Bootcamp. Build real-world projects and become a job-ready full-stack developer.',
+            'description' => 'Master front-end and back-end technologies in this comprehensive Web Development Bootcamp. Learn to design stunning, responsive interfaces and develop powerful, scalable server-side applications. Work on real-world projects, collaborate with peers, and gain hands-on experience with tools used by top developers. By the end of the program, you’ll have a strong portfolio and the skills to launch your career as a job-ready full-stack developer.',
             "full_description" => "This Complete Web Development Bootcamp is designed to take you from a beginner to a proficient full-stack web developer. Throughout this course, you will learn the fundamentals of web development, including HTML, CSS, JavaScript, and popular frameworks like Node.js and Express. You will also gain hands-on experience by building real-world projects that showcase your skills to potential employers.",
             'category' => 'Web Development',
             'author' => 'John Anderson',

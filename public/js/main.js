@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", function () {
     initMobileMenu();
     initSearchModal();
     initScrollEffects();
-    initCartFunctionality();
 });
 
 // Mobile Menue Responsiveness
@@ -113,54 +112,6 @@ function initScrollEffects() {
         }
 
         lastScroll = currentScroll;
-    });
-}
-
-// Cart Functionality
-function initCartFunctionality() {
-    const addToCartButtons = document.querySelectorAll(
-        ".product-card .btn-primary"
-    );
-    const cartCount = document.querySelector(".cart-count");
-    let cartItems = parseInt(localStorage.getItem("cartItems")) || 0;
-
-    // Update cart count on page load
-    if (cartCount) {
-        cartCount.textContent = cartItems;
-    }
-
-    addToCartButtons.forEach((button) => {
-        button.addEventListener("click", function (e) {
-            e.preventDefault();
-
-            // Increment cart count
-            cartItems++;
-            if (cartCount) {
-                cartCount.textContent = cartItems;
-
-                // Add animation
-                cartCount.style.transform = "scale(1.3)";
-                setTimeout(() => {
-                    cartCount.style.transform = "scale(1)";
-                }, 200);
-            }
-
-            // Save to localStorage
-            localStorage.setItem("cartItems", cartItems);
-
-            // Change button text 
-            const originalText = this.textContent;
-            this.textContent = "Added!";
-            this.style.backgroundColor = "#10b981";
-
-            setTimeout(() => {
-                this.textContent = originalText;
-                this.style.backgroundColor = "";
-            }, 1500);
-
-            // Show notification
-            showNotification("Item added to cart!");
-        });
     });
 }
 

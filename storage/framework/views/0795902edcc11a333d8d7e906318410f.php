@@ -1,16 +1,16 @@
-@extends('layouts.app')
 
-@section('title', 'Checkout - CourseHub')
-@section('description', 'Complete your purchase securely.')
 
-@section('content')
+<?php $__env->startSection('title', 'Checkout - CourseHub'); ?>
+<?php $__env->startSection('description', 'Complete your purchase securely.'); ?>
+
+<?php $__env->startSection('content'); ?>
     <!-- Page Header -->
     <section class="page-header">
         <div class="container">
             <div class="breadcrumb">
-                <a href="{{ route('home') }}">Home</a>
+                <a href="<?php echo e(route('home')); ?>">Home</a>
                 <span class="separator">/</span>
-                <a href="{{ route('cart') }}">Cart</a>
+                <a href="<?php echo e(route('cart')); ?>">Cart</a>
                 <span class="separator">/</span>
                 <span>Checkout</span>
             </div>
@@ -40,8 +40,8 @@
                 </div>
             </div>
 
-            <form action="{{ route('checkout.process') }}" method="POST" class="checkout-form" id="checkoutForm">
-                @csrf
+            <form action="<?php echo e(route('checkout.process')); ?>" method="POST" class="checkout-form" id="checkoutForm">
+                <?php echo csrf_field(); ?>
                 <div class="checkout-layout">
                     <!-- Left Column - Forms -->
                     <div class="checkout-main">
@@ -241,42 +241,41 @@
 
                             <!-- Order Items -->
                             <div class="order-items">
-                                @foreach($orderItems as $item)
+                                <?php $__currentLoopData = $orderItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <div class="order-item">
-                                        {{-- <div class="order-item-image">
-                                            <i class="fas fa-book"></i>
-                                        </div> --}}
-                                        <img style="width: 100%;" src="{{ asset('images' . $item['image']) }}" alt="">
+                                        
+                                        <img style="width: 100%;" src="<?php echo e(asset('images' . $item['image'])); ?>" alt="">
 
                                         <div class="order-item-details">
-                                            <h4 class="order-item-title">{{ $item['title'] }}</h4>
-                                            <p class="order-item-author">{{ $item['author'] }}</p>
+                                            <h4 class="order-item-title"><?php echo e($item['title']); ?></h4>
+                                            <p class="order-item-author"><?php echo e($item['author']); ?></p>
                                         </div>
                                         <div class="order-item-price">
-                                            ${{ number_format($item['price'], 2) }}
+                                            $<?php echo e(number_format($item['price'], 2)); ?>
+
                                         </div>
                                     </div>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
 
                             <!-- Price Breakdown -->
                             <div class="price-breakdown">
                                 <div class="price-row">
                                     <span>Subtotal</span>
-                                    <span>${{ number_format($subtotal, 2) }}</span>
+                                    <span>$<?php echo e(number_format($subtotal, 2)); ?></span>
                                 </div>
                                 <div class="price-row">
                                     <span>Discount</span>
-                                    <span class="discount-text">-${{ number_format($discount, 2) }}</span>
+                                    <span class="discount-text">-$<?php echo e(number_format($discount, 2)); ?></span>
                                 </div>
                                 <div class="price-row">
                                     <span>Tax</span>
-                                    <span>${{ number_format($tax, 2) }}</span>
+                                    <span>$<?php echo e(number_format($tax, 2)); ?></span>
                                 </div>
                                 <div class="price-divider"></div>
                                 <div class="price-row price-total">
                                     <span>Total</span>
-                                    <span>${{ number_format($total, 2) }}</span>
+                                    <span>$<?php echo e(number_format($total, 2)); ?></span>
                                 </div>
                             </div>
 
@@ -315,9 +314,9 @@
             </form>
         </div>
     </section>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('styles')
+<?php $__env->startSection('styles'); ?>
     <style>
         .checkout-section {
             padding: 60px 0;
@@ -692,9 +691,9 @@
         }
     </style>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script>
         // Checkout page JavaScript
         document.addEventListener('DOMContentLoaded', function () {
@@ -755,4 +754,5 @@
             }
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\coursehub\resources\views/pages/checkout.blade.php ENDPATH**/ ?>

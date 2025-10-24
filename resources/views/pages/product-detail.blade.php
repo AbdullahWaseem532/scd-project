@@ -75,10 +75,12 @@
                 <!-- Right Sidebar - Preview Card (Desktop Only) -->
                 <div class="product-preview-card desktop-only">
                     <div class="preview-image">
-                        <div class="preview-image-placeholder">
+                        {{-- <div class="preview-image-placeholder">
                             <i class="fas fa-play-circle play-icon"></i>
                             <span class="preview-text">Preview this course</span>
-                        </div>
+                        </div> --}}
+                        <img style="width: 100%;" src="{{ asset('images' . $product['image']) }}" alt="">
+
                         @if(isset($product['badge']))
                             <span class="preview-badge">{{ $product['badge'] }}</span>
                         @endif
@@ -267,45 +269,6 @@
                         </button>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Related Courses -->
-    <section class="related-courses-section">
-        <div class="container">
-            <h2 class="content-title">Students also bought</h2>
-            <div class="products-grid">
-                @foreach($relatedCourses as $course)
-                    <div class="product-card">
-                        <div class="product-image">
-                            <a href="{{ route('products.show', $course['id']) }}">
-                                <img src="{{ asset('images' . $course['image']) }}" alt="">
-                            </a>
-                        </div>
-                        <div class="product-info">
-                            <span class="product-category">{{ $course['category'] }}</span>
-                            <h3 class="product-title">
-                                <a href=" {{ route('products.show', $course['id']) }}">{{ $course['title'] }}</a>
-                            </h3>
-                            <div class="product-author">
-                                <i class="fas fa-user"></i>
-                                <span>{{ $course['author'] }}</span>
-                            </div>
-                            <div class="product-rating">
-                                <div class="stars">
-                                    @for($i = 0; $i < 5; $i++) <i class="fas fa-star"></i>
-                                    @endfor
-                                </div>
-                                <span class="rating-count">({{ $course['reviews'] }})</span>
-                            </div>
-                            <div class="product-footer">
-                                <span class="product-price">${{ number_format($course['price'], 2) }}</span>
-                                <button class="btn btn-primary btn-sm">Add to Cart</button>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
             </div>
         </div>
     </section>
@@ -1063,57 +1026,5 @@
             const section = document.querySelector(`#section-${index}`).parentElement;
             section.classList.toggle('active');
         }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            // Add to cart functionality
-            const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
-            addToCartButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    // Simulate adding to cart
-                    const originalText = this.innerHTML;
-                    this.innerHTML = '<i class="fas fa-check"></i> Added!';
-                    this.style.backgroundColor = 'var(--success)';
-
-                    setTimeout(() => {
-                        this.innerHTML = originalText;
-                        this.style.backgroundColor = '';
-                    }, 2000);
-
-                    // Update cart counter in header
-                    const cartCount = document.querySelector('.cart-count');
-                    if (cartCount) {
-                        const currentCount = parseInt(cartCount.textContent);
-                        cartCount.textContent = currentCount + 1;
-                    }
-                });
-            });
-
-            // Wishlist toggle
-            const wishlistButtons = document.querySelectorAll('.wishlist-btn');
-            wishlistButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const icon = this.querySelector('i');
-                    if (icon.classList.contains('far')) {
-                        icon.classList.remove('far');
-                        icon.classList.add('fas');
-                        this.style.color = 'var(--error)';
-                    } else {
-                        icon.classList.remove('fas');
-                        icon.classList.add('far');
-                        this.style.color = '';
-                    }
-                });
-            });
-
-            // Helpful review buttons
-            const helpfulButtons = document.querySelectorAll('.helpful-btn');
-            helpfulButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    this.style.backgroundColor = 'var(--primary-color)';
-                    this.style.color = 'var(--white)';
-                    this.style.borderColor = 'var(--primary-color)';
-                });
-            });
-        });
     </script>
 @endsection

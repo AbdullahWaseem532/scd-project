@@ -1,9 +1,9 @@
-@extends('layouts.app')
 
-@section('title', 'Order Confirmation - CourseHub')
-@section('description', 'Your order has been successfully placed.')
 
-@section('content')
+<?php $__env->startSection('title', 'Order Confirmation - CourseHub'); ?>
+<?php $__env->startSection('description', 'Your order has been successfully placed.'); ?>
+
+<?php $__env->startSection('content'); ?>
     <!-- Order Confirmation Section -->
     <section class="confirmation-section">
         <div class="container">
@@ -18,7 +18,7 @@
                 </p>
                 <div class="order-number">
                     <span class="order-label">Order Number:</span>
-                    <span class="order-value">#{{ $orderNumber }}</span>
+                    <span class="order-value">#<?php echo e($orderNumber); ?></span>
                 </div>
             </div>
 
@@ -38,7 +38,7 @@
                                 </div>
                                 <div class="step-content">
                                     <h3>Check Your Email</h3>
-                                    <p>We've sent a confirmation email to <strong>{{ $customerEmail }}</strong> with your
+                                    <p>We've sent a confirmation email to <strong><?php echo e($customerEmail); ?></strong> with your
                                         order details and access instructions.</p>
                                 </div>
                             </div>
@@ -81,14 +81,14 @@
                             <i class="fas fa-book"></i> Your Purchased Courses
                         </h2>
                         <div class="purchased-courses">
-                            @foreach($purchasedCourses as $course)
+                            <?php $__currentLoopData = $purchasedCourses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <div class="purchased-course">
                                     <div class="course-thumbnail">
-                                        <img src="{{ asset('images' . $course['image']) }}" alt="">
+                                        <img src="<?php echo e(asset('images' . $course['image'])); ?>" alt="">
                                     </div>
                                     <div class="course-details">
-                                        <h3 class="course-title">{{ $course['title'] }}</h3>
-                                        <p class="course-instructor">By {{ $course['author'] }}</p>
+                                        <h3 class="course-title"><?php echo e($course['title']); ?></h3>
+                                        <p class="course-instructor">By <?php echo e($course['author']); ?></p>
                                         <div class="course-meta">
                                             <span class="meta-badge">
                                                 <i class="fas fa-infinity"></i>
@@ -102,7 +102,7 @@
                                         </a>
                                     </div>
                                 </div>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                     </div>
 
@@ -114,33 +114,33 @@
                         <div class="order-summary-details">
                             <div class="summary-row">
                                 <span>Order Date:</span>
-                                <span>{{ $orderDate }}</span>
+                                <span><?php echo e($orderDate); ?></span>
                             </div>
                             <div class="summary-row">
                                 <span>Payment Method:</span>
-                                <span>{{ $paymentMethod }}</span>
+                                <span><?php echo e($paymentMethod); ?></span>
                             </div>
                             <div class="summary-row">
                                 <span>Transaction ID:</span>
-                                <span>{{ $transactionId }}</span>
+                                <span><?php echo e($transactionId); ?></span>
                             </div>
                             <div class="summary-divider"></div>
                             <div class="summary-row">
                                 <span>Subtotal:</span>
-                                <span>${{ number_format($subtotal, 2) }}</span>
+                                <span>$<?php echo e(number_format($subtotal, 2)); ?></span>
                             </div>
                             <div class="summary-row">
                                 <span>Discount:</span>
-                                <span class="discount-text">-${{ number_format($discount, 2) }}</span>
+                                <span class="discount-text">-$<?php echo e(number_format($discount, 2)); ?></span>
                             </div>
                             <div class="summary-row">
                                 <span>Tax:</span>
-                                <span>${{ number_format($tax, 2) }}</span>
+                                <span>$<?php echo e(number_format($tax, 2)); ?></span>
                             </div>
                             <div class="summary-divider"></div>
                             <div class="summary-row summary-total">
                                 <span>Total Paid:</span>
-                                <span>${{ number_format($total, 2) }}</span>
+                                <span>$<?php echo e(number_format($total, 2)); ?></span>
                             </div>
                         </div>
                     </div>
@@ -151,12 +151,12 @@
                             <i class="fas fa-map-marker-alt"></i> Billing Information
                         </h2>
                         <div class="billing-info">
-                            <p><strong>{{ $billingInfo['name'] }}</strong></p>
-                            <p>{{ $billingInfo['email'] }}</p>
-                            <p>{{ $billingInfo['phone'] }}</p>
-                            <p>{{ $billingInfo['address'] }}</p>
-                            <p>{{ $billingInfo['city'] }}, {{ $billingInfo['state'] }} {{ $billingInfo['zip'] }}</p>
-                            <p>{{ $billingInfo['country'] }}</p>
+                            <p><strong><?php echo e($billingInfo['name']); ?></strong></p>
+                            <p><?php echo e($billingInfo['email']); ?></p>
+                            <p><?php echo e($billingInfo['phone']); ?></p>
+                            <p><?php echo e($billingInfo['address']); ?></p>
+                            <p><?php echo e($billingInfo['city']); ?>, <?php echo e($billingInfo['state']); ?> <?php echo e($billingInfo['zip']); ?></p>
+                            <p><?php echo e($billingInfo['country']); ?></p>
                         </div>
                     </div>
                 </div>
@@ -171,7 +171,7 @@
                                 <i class="fas fa-th-large"></i>
                                 <span>Go to Dashboard</span>
                             </a>
-                            <a href="{{ route('products') }}" class="action-btn">
+                            <a href="<?php echo e(route('products')); ?>" class="action-btn">
                                 <i class="fas fa-shopping-bag"></i>
                                 <span>Browse More Courses</span>
                             </a>
@@ -192,7 +192,7 @@
                         <div class="support-info">
                             <p>If you have any questions about your order, please contact our support team.</p>
                             <div class="support-methods">
-                                <a href="{{ route('contact') }}" class="support-link">
+                                <a href="<?php echo e(route('contact')); ?>" class="support-link">
                                     <i class="fas fa-envelope"></i>
                                     <span>Contact Support</span>
                                 </a>
@@ -265,9 +265,9 @@
             </div>
         </div>
     </section>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('styles')
+<?php $__env->startSection('styles'); ?>
     <style>
         .confirmation-section {
             padding: 60px 0;
@@ -730,9 +730,9 @@
         }
     </style>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script>
         // Confirmation page JavaScript
         document.addEventListener('DOMContentLoaded', function () {
@@ -769,4 +769,5 @@
             }
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\coursehub\resources\views/pages/order-complete.blade.php ENDPATH**/ ?>

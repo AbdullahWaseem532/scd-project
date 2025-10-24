@@ -8,33 +8,15 @@ class CheckoutController extends Controller
 {
     public function index()
     {
-        // Order items (from cart)
-        $orderItems = [
-            [
-                'id' => 1,
-                'title' => 'Complete Web Development Bootcamp',
-                'author' => 'John Anderson',
-                'price' => 49.99,
-                'image' => '/web-dev.jpg'
-            ],
-            [
-                'id' => 2,
-                'title' => 'Data Science Master Class',
-                'author' => 'Sarah Mitchell',
-                'price' => 79.99,
-                'image' => '/data-science.jpg'
-            ],
-            [
-                'id' => 4,
-                'title' => 'UI/UX Design Principles',
-                'author' => 'Emily Roberts',
-                'price' => 59.99,
-                'image' => '/ui-ux.jpg'
-            ]
-        ];
+        // ✅ Get cart items from session
+        $orderItems = session('cart', []);
 
-        // Calculate pricing
-        $subtotal = array_sum(array_column($orderItems, 'price'));
+        if (empty($orderItems)) {
+            return redirect()->route('cart')->with('error', 'Your cart is empty.');
+        }
+
+        // ✅ Calculate pricing
+        $subtotal = collect($orderItems)->sum('price');
         $discount = $subtotal * 0.15; // 15% discount
         $tax = ($subtotal - $discount) * 0.08; // 8% tax
         $total = $subtotal - $discount + $tax;
@@ -48,7 +30,7 @@ class CheckoutController extends Controller
         ));
     }
 
-   
+
     public function process(Request $request)
     {
         // Validate the request

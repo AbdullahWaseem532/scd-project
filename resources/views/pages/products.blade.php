@@ -169,9 +169,10 @@
                                             <span class="product-badge">{{ $product['badge'] }}</span>
                                         @endif
                                         <img src="{{ asset('images' . $product['image']) }}" alt="">
-
                                     </div>
-                                    <div class="product-info">
+                                </a>
+                                <div class="product-info">
+                                    <a href="{{ route('products.show', $product['id']) }}">
                                         <span class="product-category">{{ $product['category'] }}</span>
                                         <h3 class="product-title">{{ $product['title'] }}</h3>
                                         <div class="product-author">
@@ -197,32 +198,39 @@
                                             </div>
                                             <span class="rating-count">({{ $product['reviews'] }})</span>
                                         </div>
-                                        <div class="product-footer">
+                                    </a>
+                                    <div class="product-footer">
+                                        <a href="{{ route('products.show', $product['id']) }}">
                                             <span class="product-price">${{ number_format($product['price'], 2) }}</span>
-                                            <button class="btn btn-primary btn-sm">Add to Cart</button>
-                                        </div>
+                                        </a>
+                                        <button class="btn btn-primary btn-sm add-to-cart" data-id="{{ $product['id'] }}"
+                                            data-title="{{ $product['title'] }}" data-price="{{ $product['price'] }}"
+                                            data-author="{{ $product['author'] }}" data-image="{{ $product['image'] }}">
+                                            Add to Cart
+                                        </button>
                                     </div>
-                                </a>
+                                </div>
                             </div>
                         @endforeach
                     </div>
+                </div>
 
-                    <!-- Pagination -->
-                    <div class="pagination">
-                        <button class="pagination-btn" disabled>
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <button class="pagination-btn active">1</button>
-                        <button class="pagination-btn">2</button>
-                        <button class="pagination-btn">3</button>
-                        <span class="pagination-dots">...</span>
-                        <button class="pagination-btn">10</button>
-                        <button class="pagination-btn">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="pagination-btn" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="pagination-btn active">1</button>
+                    <button class="pagination-btn">2</button>
+                    <button class="pagination-btn">3</button>
+                    <span class="pagination-dots">...</span>
+                    <button class="pagination-btn">10</button>
+                    <button class="pagination-btn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
                 </div>
             </div>
+        </div>
         </div>
     </section>
 @endsection
@@ -323,6 +331,32 @@
                 });
 
                 products.forEach(p => (p.style.display = "block"));
+            });
+        });
+    </script>
+
+    <script>
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.addEventListener('click', function () {
+                fetch('{{ route('cart.add') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        id: this.dataset.id,
+                        title: this.dataset.title,
+                        price: this.dataset.price,
+                        author: this.dataset.author,
+                        image: this.dataset.image,
+                    })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        alert(data.message)
+                        window.location.href = '{{ route('cart') }}';
+                    });
             });
         });
     </script>

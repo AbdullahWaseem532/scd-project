@@ -25,49 +25,41 @@
                 <div class="cart-items">
                     <div class="cart-header">
                         <h2>Your Cart (<?php echo e(count($cartItems)); ?> items)</h2>
-                        <button class="btn-text clear-cart">Clear All</button>
+
+                        <?php if(count($cartItems) > 0): ?>
+                            <form action="<?php echo e(route('cart.clear')); ?>" method="POST" id="clearCartForm">
+                                <?php echo csrf_field(); ?>
+                                <?php echo method_field('DELETE'); ?>
+                                <button type="submit" class="btn-text clear-cart">
+                                    Clear All
+                                </button>
+                            </form>
+                        <?php endif; ?>
                     </div>
 
                     <?php if(count($cartItems) > 0): ?>
                         <?php $__currentLoopData = $cartItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="cart-item" data-item-id="<?php echo e($item['id']); ?>">
                                 <div class="cart-item-image">
-                                    
                                     <img src="<?php echo e(asset('images' . $item['image'])); ?>" alt="">
-
                                 </div>
                                 <div class="cart-item-details">
                                     <h3 class="cart-item-title"><?php echo e($item['title']); ?></h3>
                                     <p class="cart-item-author">By <?php echo e($item['author']); ?></p>
-                                    <div class="cart-item-meta">
-                                        <span class="meta-item">
-                                            <i class="fas fa-clock"></i>
-                                            <?php echo e($item['duration']); ?>
-
-                                        </span>
-                                        <span class="meta-item">
-                                            <i class="fas fa-signal"></i>
-                                            <?php echo e($item['level']); ?>
-
-                                        </span>
-                                    </div>
-                                    <div class="cart-item-rating">
-                                        <div class="stars">
-                                            <?php for($i = 0; $i < 5; $i++): ?>
-                                                <i class="fas fa-star<?php echo e($i < floor($item['rating']) ? '' : ' star-empty'); ?>"></i>
-                                            <?php endfor; ?>
-                                        </div>
-                                        <span class="rating-text"><?php echo e($item['rating']); ?> (<?php echo e($item['reviews']); ?> reviews)</span>
-                                    </div>
                                 </div>
                                 <div class="cart-item-actions">
                                     <div class="cart-item-price">
                                         <span class="price-label">Price:</span>
                                         <span class="price-value">$<?php echo e(number_format($item['price'], 2)); ?></span>
                                     </div>
-                                    <button class="btn-text remove-item" data-item-id="<?php echo e($item['id']); ?>">
-                                        <i class="fas fa-trash-alt"></i> Remove
-                                    </button>
+
+                                    <form action="<?php echo e(route('cart.remove', $item['id'])); ?>" method="POST" class="removeItemForm">
+                                        <?php echo csrf_field(); ?>
+                                        <?php echo method_field('DELETE'); ?>
+                                        <button type="submit" class="btn-text">
+                                            <i class="fas fa-trash-alt"></i> Remove
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -172,10 +164,13 @@
             <div class="products-grid">
                 <?php $__currentLoopData = $recommendedCourses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div class="product-card">
-                        <div class="product-image">
-                            <span class="product-badge">Popular</span>
-                            <img src="<?php echo e(asset('images' . $course['image'])); ?>" alt="">
-                        </div>
+                        <a href="<?php echo e(route('products.show', $course['id'])); ?>">
+                            <div class="product-image">
+                                <span class="product-badge">Popular</span>
+                                <img src="<?php echo e(asset('images' . $course['image'])); ?>" alt="">
+                            </div>
+                        </a>
+
                         <div class="product-info">
                             <span class="product-category"><?php echo e($course['category']); ?></span>
                             <h3 class="product-title"><?php echo e($course['title']); ?></h3>
@@ -193,7 +188,11 @@
                             </div>
                             <div class="product-footer">
                                 <span class="product-price">$<?php echo e(number_format($course['price'], 2)); ?></span>
-                                <button class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn btn-primary btn-sm add-to-cart" data-id="<?php echo e($course['id']); ?>"
+                                    data-title="<?php echo e($course['title']); ?>" data-price="<?php echo e($course['price']); ?>"
+                                    data-author="<?php echo e($course['author']); ?>" data-image="<?php echo e($course['image']); ?>">
+                                    Add to Cart
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -204,343 +203,408 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('styles'); ?>
-<style>
-/* Cart Page Specific Styles */
-.cart-section {
-    padding: 4rem 0;
-    background-color: #f9fafb;
-}
+    <style>
+        /* Cart Page Specific Styles */
+        .cart-section {
+            padding: 1rem 0;
+            background-color: #f9fafb;
+        }
 
-.cart-layout {
-    display: grid;
-    grid-template-columns: 1fr 400px;
-    gap: 3rem;
-    align-items: start;
-}
+        .cart-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 3rem;
+            align-items: start;
+        }
 
-/* Cart Items */
-.cart-items {
-    background-color: #ffffff;
-    border-radius: 0.75rem;
-    padding: 3rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
+        /* Cart Items */
+        .cart-items {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 3rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
 
-.cart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 3rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 2px solid #e5e7eb;
-}
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
 
-.cart-header h2 {
-    margin: 0;
-    font-size: 1.5rem;
-}
+        .cart-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
 
-.clear-cart {
-    color: #ef4444;
-}
+        .clear-cart {
+            color: #ef4444;
+        }
 
-.clear-cart:hover {
-    text-decoration: underline;
-}
+        .clear-cart:hover {
+            text-decoration: underline;
+        }
 
-/* Cart Item */
-.cart-item {
-    display: grid;
-    grid-template-columns: 120px 1fr auto;
-    gap: 1.5rem;
-    padding: 2rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.75rem;
-    margin-bottom: 1.5rem;
-    transition: box-shadow 150ms ease-in-out;
-}
+        /* Cart Item */
+        .cart-item {
+            display: grid;
+            grid-template-columns: 120px 1fr auto;
+            gap: 1.5rem;
+            padding: 2rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            transition: box-shadow 150ms ease-in-out;
+        }
 
-.cart-item:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
+        .cart-item:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
 
-.cart-item-image {
-    width: 120px;
-    height: 80px;
-}
+        .cart-item-image {
+            width: 120px;
+            height: 80px;
+        }
 
-.cart-item-image img {
-    width: 100%;
-}
+        .cart-item-image img {
+            width: 100%;
+        }
 
-.cart-image-placeholder {
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
-    border-radius: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #9ca3af;
-    font-size: 2rem;
-}
+        .cart-image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: 2rem;
+        }
 
-.cart-item-details {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
+        .cart-item-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
 
-.cart-item-title {
-    font-size: 1.125rem;
-    margin: 0;
-    color: #111827;
-}
+        .cart-item-title {
+            font-size: 1.125rem;
+            margin: 0;
+            color: #111827;
+        }
 
-.cart-item-author {
-    color: #4b5563;
-    font-size: 0.875rem;
-    margin: 0;
-}
+        .cart-item-author {
+            color: #4b5563;
+            font-size: 0.875rem;
+            margin: 0;
+        }
 
-.cart-item-meta {
-    display: flex;
-    gap: 1.5rem;
-    margin-top: 0.5rem;
-}
+        .cart-item-meta {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 0.5rem;
+        }
 
-.cart-item-rating {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
+        .cart-item-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
-.rating-text {
-    font-size: 0.875rem;
-    color: #4b5563;
-}
+        .rating-text {
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
 
-.cart-item-actions {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 1rem;
-}
+        .cart-item-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 1rem;
+        }
 
-.cart-item-price {
-    text-align: right;
-}
+        .cart-item-price {
+            text-align: right;
+        }
 
-.price-label {
-    display: block;
-    font-size: 0.875rem;
-    color: #4b5563;
-    margin-bottom: 4px;
-}
+        .price-label {
+            display: block;
+            font-size: 0.875rem;
+            color: #4b5563;
+            margin-bottom: 4px;
+        }
 
-.price-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #111827;
-}
+        .price-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111827;
+        }
 
-.remove-item {
-    color: #ef4444;
-}
+        .remove-item {
+            color: #ef4444;
+        }
 
-.save-later {
-    color: #2563eb;
-}
+        .save-later {
+            color: #2563eb;
+        }
 
-/* Empty Cart */
-.empty-cart {
-    text-align: center;
-    padding: 4rem;
-}
+        /* Empty Cart */
+        .empty-cart {
+            text-align: center;
+            padding: 4rem;
+        }
 
-.empty-cart i {
-    font-size: 5rem;
-    color: #d1d5db;
-    margin-bottom: 1.5rem;
-}
+        .empty-cart i {
+            font-size: 5rem;
+            color: #d1d5db;
+            margin-bottom: 1.5rem;
+        }
 
-.empty-cart h3 {
-    color: #374151;
-    margin-bottom: 1rem;
-}
+        .empty-cart h3 {
+            color: #374151;
+            margin-bottom: 1rem;
+        }
 
-.empty-cart p {
-    color: #4b5563;
-    margin-bottom: 2rem;
-}
+        .empty-cart p {
+            color: #4b5563;
+            margin-bottom: 2rem;
+        }
 
-/* Cart Summary */
-.cart-summary {
-    position: sticky;
-    top: 100px;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
+        /* Cart Summary */
+        .cart-summary {
+            position: sticky;
+            top: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
 
-.summary-card {
-    background-color: #ffffff;
-    border-radius: 0.75rem;
-    padding: 3rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
+        .summary-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 3rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
 
-.summary-title {
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-}
+        .summary-title {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+        }
 
-.summary-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    color: #374151;
-}
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            color: #374151;
+        }
 
-.discount-amount {
-    color: #10b981;
-    font-weight: 600;
-}
+        .discount-amount {
+            color: #10b981;
+            font-weight: 600;
+        }
 
-.summary-divider {
-    height: 1px;
-    background-color: #e5e7eb;
-    margin: 1.5rem 0;
-}
+        .summary-divider {
+            height: 1px;
+            background-color: #e5e7eb;
+            margin: 1.5rem 0;
+        }
 
-.summary-total {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 2rem;
-}
+        .summary-total {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 2rem;
+        }
 
-.checkout-btn {
-    margin-bottom: 1.5rem;
-}
+        .checkout-btn {
+            margin-bottom: 1.5rem;
+        }
 
-.coupon-section {
-    padding-top: 1.5rem;
-    border-top: 1px solid #e5e7eb;
-}
+        .coupon-section {
+            padding-top: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+        }
 
-.coupon-label {
-    font-size: 0.875rem;
-    color: #4b5563;
-    margin-bottom: 1rem;
-}
+        .coupon-label {
+            font-size: 0.875rem;
+            color: #4b5563;
+            margin-bottom: 1rem;
+        }
 
-.coupon-form {
-    display: flex;
-    gap: 0.5rem;
-}
+        .coupon-form {
+            display: flex;
+            gap: 0.5rem;
+        }
 
-.coupon-input {
-    flex: 1;
-    padding: 0.5rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-}
+        .coupon-input {
+            flex: 1;
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
 
-.apply-coupon {
-    padding: 0.5rem 1.5rem;
-}
+        .apply-coupon {
+            padding: 0.5rem 1.5rem;
+        }
 
-/* Promo Card */
-.promo-card {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    color: #ffffff;
-    padding: 2rem;
-    border-radius: 0.75rem;
-    text-align: center;
-}
+        /* Promo Card */
+        .promo-card {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: #ffffff;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            text-align: center;
+        }
 
-.promo-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-}
+        .promo-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
 
-.promo-card h4 {
-    color: #ffffff;
-    margin-bottom: 0.5rem;
-}
+        .promo-card h4 {
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
 
-.promo-card p {
-    color: #ffffff;
-    opacity: 0.95;
-    margin: 0;
-    font-size: 0.875rem;
-}
+        .promo-card p {
+            color: #ffffff;
+            opacity: 0.95;
+            margin: 0;
+            font-size: 0.875rem;
+        }
 
-/* Trust Badges */
-.trust-badges {
-    background-color: #f9fafb;
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
+        /* Trust Badges */
+        .trust-badges {
+            background-color: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
 
-.trust-badge {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    color: #374151;
-    font-size: 0.875rem;
-}
+        .trust-badge {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #374151;
+            font-size: 0.875rem;
+        }
 
-.trust-badge i {
-    color: #10b981;
-    font-size: 1.125rem;
-}
+        .trust-badge i {
+            color: #10b981;
+            font-size: 1.125rem;
+        }
 
-/* Continue Shopping */
-.continue-shopping {
-    margin-top: 3rem;
-    text-align: center;
-}
+        /* Continue Shopping */
+        .continue-shopping {
+            margin-top: 3rem;
+            text-align: center;
+        }
 
-/* Recommended Section */
-.recommended-section {
-    padding: 4rem 0;
-    background-color: #ffffff;
-}
+        /* Recommended Section */
+        .recommended-section {
+            padding: 4rem 0;
+            background-color: #ffffff;
+        }
 
-/* Responsive */
-@media (max-width: 1024px) {
-    .cart-layout {
-        grid-template-columns: 1fr;
-    }
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .cart-layout {
+                grid-template-columns: 1fr;
+            }
 
-    .cart-summary {
-        position: static;
-    }
-}
+            .cart-summary {
+                position: static;
+            }
+        }
 
-@media (max-width: 768px) {
-    .cart-item {
-        grid-template-columns: 1fr;
-    }
+        @media (max-width: 768px) {
+            .cart-item {
+                grid-template-columns: 1fr;
+            }
 
-    .cart-item-actions {
-        align-items: flex-start;
-        flex-direction: row;
-        justify-content: space-between;
-    }
+            .cart-item-actions {
+                align-items: flex-start;
+                flex-direction: row;
+                justify-content: space-between;
+            }
 
-    .cart-item-image {
-        display: none;
-    }
-}
-</style>
+            .cart-item-image {
+                display: none;
+            }
+        }
+    </style>
+<?php $__env->stopSection(); ?>
 
+
+<?php $__env->startSection('scripts'); ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // AJAX remove single item
+            document.querySelectorAll('.removeItemForm').forEach(form => {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    if (!confirm('Remove this item from cart?')) return;
+
+                    fetch(this.action, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
+                        }
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                location.reload();
+                            }
+                        });
+                });
+            });
+
+            // Clear all
+            const clearForm = document.getElementById('clearCartForm');
+            if (clearForm) {
+                clearForm.addEventListener('submit', function (e) {
+                    if (!confirm('Are you sure you want to clear all items?')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        });
+    </script>
+
+
+    
+    <script>
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.addEventListener('click', function () {
+                fetch('<?php echo e(route('cart.add')); ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
+                    },
+                    body: JSON.stringify({
+                        id: this.dataset.id,
+                        title: this.dataset.title,
+                        price: this.dataset.price,
+                        author: this.dataset.author,
+                        image: this.dataset.image,
+                    })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        alert(data.message)
+                        window.location.href = '<?php echo e(route('cart')); ?>';
+                    });
+            });
+        });
+    </script>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\coursehub\resources\views/pages/cart.blade.php ENDPATH**/ ?>

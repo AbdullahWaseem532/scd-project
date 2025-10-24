@@ -85,13 +85,6 @@
                     <h3 class="category-title">Business</h3>
                     <p class="category-count">75+ Courses</p>
                 </div>
-                <div class="category-card">
-                    <div class="category-icon">
-                        <i class="fas fa-brain"></i>
-                    </div>
-                    <h3 class="category-title">Personal Growth</h3>
-                    <p class="category-count">60+ Courses</p>
-                </div>
             </div>
         </div>
     </section>
@@ -108,10 +101,14 @@
                     <div class="product-card">
                         <a href="{{ route('products.show', $product['id']) }}">
                             <div class="product-image">
-                                <span class="product-badge">{{ $product['badge'] }}</span>
+                                @if(isset($product['badge']))
+                                    <span class="product-badge">{{ $product['badge'] }}</span>
+                                @endif
                                 <img src="{{ asset('images' . $product['image']) }}" alt="">
                             </div>
-                            <div class="product-info">
+                        </a>
+                        <div class="product-info">
+                            <a href="{{ route('products.show', $product['id']) }}">
                                 <span class="product-category">{{ $product['category'] }}</span>
                                 <h3 class="product-title">{{ $product['title'] }}</h3>
                                 <div class="product-author">
@@ -125,14 +122,20 @@
                                                 class="fas fa-star{{ $i < floor($product['rating']) ? '' : ($i < $product['rating'] ? '-half-alt' : ' star-empty') }}"></i>
                                         @endfor
                                     </div>
-                                    <span class="rating-count">({{ $product['reviews'] }} reviews)</span>
+                                    <span class="rating-count">({{ $product['reviews'] }})</span>
                                 </div>
-                                <div class="product-footer">
+                            </a>
+                            <div class="product-footer">
+                                <a href="{{ route('products.show', $product['id']) }}">
                                     <span class="product-price">${{ number_format($product['price'], 2) }}</span>
-                                    <button class="btn btn-primary btn-sm">Add to Cart</button>
-                                </div>
+                                </a>
+                                <button class="btn btn-primary btn-sm add-to-cart" data-id="{{ $product['id'] }}"
+                                    data-title="{{ $product['title'] }}" data-price="{{ $product['price'] }}"
+                                    data-author="{{ $product['author'] }}" data-image="{{ $product['image'] }}">
+                                    Add to Cart
+                                </button>
                             </div>
-                        </a>
+                        </div>
                     </div>
                 @endforeach
             </div>
@@ -172,7 +175,7 @@
                     <p class="feature-description">Earn recognized certificates upon course completion to boost your resume
                     </p>
                 </div>
-                <div class="feature-card">
+                {{-- <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-mobile-alt"></i>
                     </div>
@@ -192,7 +195,7 @@
                     </div>
                     <h3 class="feature-title">24/7 Support</h3>
                     <p class="feature-description">Our dedicated support team is always here to help you succeed</p>
-                </div>
+                </div> --}}
             </div>
         </div>
     </section>
@@ -238,4 +241,31 @@
             </div>
         </div>
     </section>
+@endsection
+@section('scripts')
+    <script>
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.addEventListener('click', function () {
+                fetch('{{ route('cart.add') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        id: this.dataset.id,
+                        title: this.dataset.title,
+                        price: this.dataset.price,
+                        author: this.dataset.author,
+                        image: this.dataset.image,
+                    })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        alert(data.message)
+                        window.location.href = '{{ route('cart') }}';
+                    });
+            });
+        });
+    </script>
 @endsection
