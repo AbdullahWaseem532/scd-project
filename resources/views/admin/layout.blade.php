@@ -84,7 +84,6 @@
                 <div class="position-sticky pt-3">
                     <div class="text-center mb-4">
                         <h4 class="text-white">
-                            <i class="fas fa-graduation-cap"></i>
                             CourseHub Admin
                         </h4>
                     </div>

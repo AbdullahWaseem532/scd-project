@@ -10,7 +10,7 @@
 
 <div class="card">
     <div class="card-body">
-        <form action="{{ route('admin.products.update', $product) }}" method="POST">
+        <form action="{{ route('admin.products.update', $product) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             
@@ -90,6 +90,20 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="image_file" class="form-label">Upload New Image</label>
+                        <input type="file" class="form-control @error('image_file') is-invalid @enderror" 
+                               id="image_file" name="image_file" accept="image/*">
+                        @error('image_file')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="form-text text-muted">Upload a new image file (JPG, PNG, GIF, etc.)</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">OR</label>
+                    </div>
+
+                    <div class="mb-3">
                         <label for="image" class="form-label">Image URL</label>
                         <input type="url" class="form-control @error('image') is-invalid @enderror" 
                                id="image" name="image" value="{{ old('image', $product->image) }}" 
@@ -97,11 +111,23 @@
                         @error('image')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        @if($product->image)
-                        <div class="mt-2">
-                            <img src="{{ $product->image }}" alt="Current image" class="img-thumbnail" width="200">
+                        <small class="form-text text-muted">Alternatively, provide an image URL</small>
+                    </div>
+
+                    @if($product->image)
+                    <div class="mb-3">
+                        <label class="form-label">Current Image</label>
+                        <div>
+                            <img src="{{ $product->image }}" alt="Current image" class="img-thumbnail" style="max-width: 300px; max-height: 200px;">
                         </div>
-                        @endif
+                    </div>
+                    @endif
+
+                    <div class="mb-3" id="image-preview-container" style="display: none;">
+                        <label class="form-label">New Image Preview</label>
+                        <div>
+                            <img id="image-preview" src="" alt="Preview" class="img-thumbnail" style="max-width: 300px; max-height: 200px;">
+                        </div>
                     </div>
                 </div>
                 
@@ -144,4 +170,34 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    // Preview uploaded image
+    document.getElementById('image_file').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('image-preview').src = e.target.result;
+                document.getElementById('image-preview-container').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            document.getElementById('image-preview-container').style.display = 'none';
+        }
+    });
+
+    // Preview URL image
+    document.getElementById('image').addEventListener('input', function(e) {
+        const url = e.target.value;
+        if (url && url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+            document.getElementById('image-preview').src = url;
+            document.getElementById('image-preview-container').style.display = 'block';
+        } else if (!url) {
+            document.getElementById('image-preview-container').style.display = 'none';
+        }
+    });
+</script>
+@endpush
 @endsection
