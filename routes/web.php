@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/courses', [ProductController::class, 'index'])->name('products.index');
 Route::get('/courses/{slug}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/search', [ProductController::class, 'search'])->name('search');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 Route::post('/contact', [HomeController::class, 'contact'])->name('contact.submit');
 

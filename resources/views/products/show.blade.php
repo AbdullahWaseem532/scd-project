@@ -11,8 +11,15 @@
             border-bottom: 1px solid #e3e6f0;
         }
 
-        .course-breadcrumb {
-            margin-bottom: 15px;
+        .product-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
         }
 
         .breadcrumb-link {
@@ -501,7 +508,8 @@
 
             <h1 class="course-title">{{ $product->title }}</h1>
             <p class="course-subtitle">
-                {{ $product->subtitle ?? 'Master this skill with our comprehensive course designed for all levels' }}</p>
+                {{ $product->subtitle ?? 'Master this skill with our comprehensive course designed for all levels' }}
+            </p>
 
             <div class="course-meta">
                 <div class="meta-item">
@@ -551,51 +559,6 @@
                             <h2 class="section-title">Course Description</h2>
                             <div style="line-height: 1.6; color: #6c757d;">
                                 {!! nl2br(e($product->description)) !!}
-                            </div>
-                        </div>
-
-                        <!-- Curriculum -->
-                        <div class="curriculum-section">
-                            <h2 class="section-title">Course Content</h2>
-                            <div class="chapter-card">
-                                <div class="chapter-header">
-                                    <h3 class="chapter-title">Getting Started</h3>
-                                    <div class="chapter-meta">5 lectures • 45 min</div>
-                                </div>
-                                <ul class="lesson-list">
-                                    <li class="lesson-item">
-                                        <div class="lesson-icon">
-                                            <i class="fas fa-play"></i>
-                                        </div>
-                                        <div class="lesson-content">
-                                            <div class="lesson-title">Welcome to the Course</div>
-                                            <div class="lesson-duration">10:25</div>
-                                        </div>
-                                    </li>
-                                    <li class="lesson-item">
-                                        <div class="lesson-icon">
-                                            <i class="fas fa-play"></i>
-                                        </div>
-                                        <div class="lesson-content">
-                                            <div class="lesson-title">Course Overview & Objectives</div>
-                                            <div class="lesson-duration">15:30</div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div class="chapter-card">
-                                <div class="chapter-header">
-                                    <h3 class="chapter-title">Core Concepts</h3>
-                                    <div class="chapter-meta">12 lectures • 3h 20min</div>
-                                </div>
-                            </div>
-
-                            <div class="chapter-card">
-                                <div class="chapter-header">
-                                    <h3 class="chapter-title">Advanced Topics</h3>
-                                    <div class="chapter-meta">8 lectures • 2h 15min</div>
-                                </div>
                             </div>
                         </div>
 
@@ -730,9 +693,6 @@
                                         <i class="fas fa-shopping-cart me-2"></i>Add to Cart
                                     </button>
                                 </form>
-                                <button class="btn btn-wishlist">
-                                    <i class="fas fa-heart me-2"></i>Add to Wishlist
-                                </button>
                             </div>
                             <div class="course-features">
                                 <div class="feature-item">

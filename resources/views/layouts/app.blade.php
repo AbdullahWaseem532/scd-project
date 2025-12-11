@@ -173,6 +173,22 @@
             background-color: rgba(255,255,255,0.1);
         }
         
+        .hover-bg-light:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .search-container {
+            max-width: 300px;
+            width: 100%;
+        }
+        
+        @media (max-width: 991px) {
+            .search-container {
+                max-width: 100%;
+                margin: 10px 0 !important;
+            }
+        }
+        
         .cart-badge {
             position: relative;
             top: -8px;
@@ -249,7 +265,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{{ route('home') }}">
-                <i class="fas fa-graduation-cap me-2"></i>CourseHub
+                CourseHub
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -272,6 +288,15 @@
                         </a>
                     </li>
                 </ul>
+                <div class="me-3 position-relative search-container">
+                    <input type="text" 
+                           class="form-control" 
+                           id="searchInput" 
+                           placeholder="Search courses or categories..."
+                           autocomplete="off">
+                    <div id="searchResults" class="position-absolute bg-white border rounded shadow-lg mt-1 w-100" style="display: none; max-height: 400px; overflow-y: auto; z-index: 1000; top: 100%;">
+                    </div>
+                </div>
                 <ul class="navbar-nav">
                     <li class="nav-item">
                         <a class="nav-link position-relative" href="{{ route('cart.index') }}">
@@ -294,8 +319,8 @@
                                 <i class="fas fa-user me-1"></i> {{ Auth::user()->name }}
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-user-circle me-2"></i> Profile</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-bookmark me-2"></i> My Courses</a></li>
+                                {{-- <li><a class="dropdown-item" href="#"><i class="fas fa-user-circle me-2"></i> Profile</a></li> --}}
+                                {{-- <li><a class="dropdown-item" href="#"><i class="fas fa-bookmark me-2"></i> My Courses</a></li> --}}
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="POST" action="{{ route('logout') }}">
@@ -377,6 +402,85 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Simple AJAX Search
+        let searchTimeout;
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+
+        searchInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            
+            clearTimeout(searchTimeout);
+            
+            if (query.length < 2) {
+                searchResults.style.display = 'none';
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                fetch(`/search?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        displayResults(data);
+                    })
+                    .catch(error => {
+                        console.error('Search error:', error);
+                    });
+            }, 300);
+        });
+
+        function displayResults(data) {
+            if (data.products.length === 0 && data.categories.length === 0) {
+                searchResults.innerHTML = '<div class="p-3 text-muted">No results found</div>';
+                searchResults.style.display = 'block';
+                return;
+            }
+
+            let html = '';
+            
+            if (data.categories.length > 0) {
+                html += '<div class="p-2 border-bottom"><strong class="text-muted small">CATEGORIES</strong></div>';
+                data.categories.forEach(category => {
+                    html += `<a href="/courses?category=${category.slug}" class="d-block p-2 text-decoration-none text-dark hover-bg-light">
+                        <i class="fas fa-folder me-2 text-primary"></i>${category.name}
+                    </a>`;
+                });
+            }
+
+            if (data.products.length > 0) {
+                html += '<div class="p-2 border-bottom"><strong class="text-muted small">COURSES</strong></div>';
+                data.products.forEach(product => {
+                    const price = product.discount_price ? 
+                        `<span class="text-muted text-decoration-line-through me-2">$${product.price}</span><span class="text-primary fw-bold">$${product.discount_price}</span>` :
+                        `<span class="text-primary fw-bold">$${product.price}</span>`;
+                    
+                    html += `<a href="/courses/${product.slug}" class="d-block p-2 text-decoration-none text-dark hover-bg-light border-bottom">
+                        <div class="d-flex align-items-center">
+                            <img src="${product.image || 'https://via.placeholder.com/50'}" 
+                                 class="me-2" 
+                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold">${product.title}</div>
+                                <small class="text-muted">${product.category}</small>
+                                <div class="mt-1">${price}</div>
+                            </div>
+                        </div>
+                    </a>`;
+                });
+            }
+
+            searchResults.innerHTML = html;
+            searchResults.style.display = 'block';
+        }
+
+        // Hide results when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.style.display = 'none';
+            }
+        });
+    </script>
     @yield('scripts')
 </body>
 </html>
