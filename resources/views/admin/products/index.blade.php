@@ -98,79 +98,9 @@
         </div>
         
         <!-- Pagination -->
-        @if($products->hasPages())
-        <div class="d-flex justify-content-center mt-4">
-            <nav aria-label="Page navigation">
-                <ul class="pagination">
-                    {{-- Previous Page Link --}}
-                    @if($products->onFirstPage())
-                    <li class="page-item disabled">
-                        <span class="page-link">
-                            <i class="fas fa-chevron-left me-1"></i> Previous
-                        </span>
-                    </li>
-                    @else
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $products->previousPageUrl() }}">
-                            <i class="fas fa-chevron-left me-1"></i> Previous
-                        </a>
-                    </li>
-                    @endif
-
-                    {{-- Pagination Elements --}}
-                    @php
-                        $currentPage = $products->currentPage();
-                        $lastPage = $products->lastPage();
-                        $startPage = max(1, $currentPage - 2);
-                        $endPage = min($lastPage, $currentPage + 2);
-                    @endphp
-
-                    @if($startPage > 1)
-                        <li class="page-item">
-                            <a class="page-link" href="{{ $products->url(1) }}">1</a>
-                        </li>
-                        @if($startPage > 2)
-                            <li class="page-item disabled">
-                                <span class="page-link">...</span>
-                            </li>
-                        @endif
-                    @endif
-
-                    @for($page = $startPage; $page <= $endPage; $page++)
-                        <li class="page-item {{ $page == $currentPage ? 'active' : '' }}">
-                            <a class="page-link" href="{{ $products->url($page) }}">{{ $page }}</a>
-                        </li>
-                    @endfor
-
-                    @if($endPage < $lastPage)
-                        @if($endPage < $lastPage - 1)
-                            <li class="page-item disabled">
-                                <span class="page-link">...</span>
-                            </li>
-                        @endif
-                        <li class="page-item">
-                            <a class="page-link" href="{{ $products->url($lastPage) }}">{{ $lastPage }}</a>
-                        </li>
-                    @endif
-
-                    {{-- Next Page Link --}}
-                    @if($products->hasMorePages())
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $products->nextPageUrl() }}">
-                            Next <i class="fas fa-chevron-right ms-1"></i>
-                        </a>
-                    </li>
-                    @else
-                    <li class="page-item disabled">
-                        <span class="page-link">
-                            Next <i class="fas fa-chevron-right ms-1"></i>
-                        </span>
-                    </li>
-                    @endif
-                </ul>
-            </nav>
+        <div class="d-flex justify-content-center">
+            {{ $products->links() }}
         </div>
-        @endif
     </div>
 </div>
 @endsection

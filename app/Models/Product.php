@@ -30,24 +30,4 @@ class Product extends Model
     {
         return $this->discount_price ?? $this->price;
     }
-
-    public function getImageUrlAttribute()
-    {
-        if (!$this->image) {
-            return 'https://via.placeholder.com/300x200';
-        }
-
-        
-        if (strpos($this->image, 'http://') === 0 || strpos($this->image, 'https://') === 0) {
-            return $this->image;
-        }
-
-        
-        if (strpos($this->image, '/storage/') === 0) {
-            return asset($this->image);
-        }
-
-        
-        return $this->image;
-    }
 }

@@ -18,11 +18,23 @@ class AdminMiddleware
     {
         // Check if user is authenticated
         if (!Auth::check()) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please login to access this resource.'
+                ], 401);
+            }
             return redirect()->route('login')->with('error', 'Please login to access this page.');
         }
 
         // Check if user is admin
         if (!Auth::user()->is_admin) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You do not have permission to access this resource.'
+                ], 403);
+            }
             return redirect('/')->with('error', 'You do not have permission to access the admin area.');
         }
 
