@@ -3,15 +3,22 @@
 namespace App\Http\Controllers\Admin\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
 use App\Models\Product;
+use App\Services\ProductService;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    protected $productService;
+
+    public function __construct(ProductService $productService)
+    {
+        $this->productService = $productService;
+    }
+
     public function index()
     {
-        $products = Product::with('category')->latest()->paginate(10);
+        $products = $this->productService->getAllProducts();
         return response()->json([
             'success' => true,
             'data' => $products
@@ -30,18 +37,7 @@ class ProductController extends Controller
             'image' => 'nullable|string'
         ]);
 
-        $product = Product::create([
-            'title' => $request->title,
-            'slug' => \Str::slug($request->title),
-            'description' => $request->description,
-            'price' => $request->price,
-            'discount_price' => $request->discount_price,
-            'category_id' => $request->category_id,
-            'stock' => $request->stock,
-            'image' => $request->image ?? 'https://via.placeholder.com/300x200'
-        ]);
-
-        $product->load('category');
+        $product = $this->productService->createProduct($request->all());
 
         return response()->json([
             'success' => true,
@@ -52,7 +48,7 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        $product->load('category');
+        $product = $this->productService->getProduct($product);
         return response()->json([
             'success' => true,
             'data' => $product
@@ -71,18 +67,7 @@ class ProductController extends Controller
             'image' => 'nullable|string'
         ]);
 
-        $product->update([
-            'title' => $request->title,
-            'slug' => \Str::slug($request->title),
-            'description' => $request->description,
-            'price' => $request->price,
-            'discount_price' => $request->discount_price,
-            'category_id' => $request->category_id,
-            'stock' => $request->stock,
-            'image' => $request->image ?? $product->image
-        ]);
-
-        $product->load('category');
+        $product = $this->productService->updateProduct($product, $request->all());
 
         return response()->json([
             'success' => true,
@@ -93,11 +78,10 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        $product->delete();
+        $this->productService->deleteProduct($product);
         return response()->json([
             'success' => true,
             'message' => 'Product deleted successfully.'
         ]);
     }
 }
-

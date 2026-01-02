@@ -4,14 +4,21 @@ namespace App\Http\Controllers\Admin\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Services\CategoryService;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    
+    protected $categoryService;
+
+    public function __construct(CategoryService $categoryService)
+    {
+        $this->categoryService = $categoryService;
+    }
+
     public function index()
     {
-        $categories = Category::withCount('products')->latest()->paginate(10);
+        $categories = $this->categoryService->getAllCategories();
         return response()->json([
             'success' => true,
             'data' => $categories
@@ -25,11 +32,7 @@ class CategoryController extends Controller
             'description' => 'nullable|string'
         ]);
 
-        $category = Category::create([
-            'name' => $request->name,
-            'slug' => \Str::slug($request->name),
-            'description' => $request->description
-        ]);
+        $category = $this->categoryService->createCategory($request->all());
 
         return response()->json([
             'success' => true,
@@ -40,7 +43,7 @@ class CategoryController extends Controller
 
     public function show(Category $category)
     {
-        $category->loadCount('products');
+        $category = $this->categoryService->getCategory($category);
         return response()->json([
             'success' => true,
             'data' => $category
@@ -54,11 +57,7 @@ class CategoryController extends Controller
             'description' => 'nullable|string'
         ]);
 
-        $category->update([
-            'name' => $request->name,
-            'slug' => \Str::slug($request->name),
-            'description' => $request->description
-        ]);
+        $category = $this->categoryService->updateCategory($category, $request->all());
 
         return response()->json([
             'success' => true,
@@ -66,14 +65,13 @@ class CategoryController extends Controller
             'data' => $category
         ]);
     }
-    
+
     public function destroy(Category $category)
     {
-        $category->delete();
+        $this->categoryService->deleteCategory($category);
         return response()->json([
             'success' => true,
             'message' => 'Category deleted successfully.'
         ]);
     }
 }
-
